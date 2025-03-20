@@ -43,43 +43,37 @@ st.write(f"stock end date: {stock_end_date}")
 ## 가짜 응답 양식 지정 -> 데이터 만들고 -> 프론트에서 DF로 만들고 -> 사이트 완성
 response = mockup_request()
 
-# TODO 1. 데이터를 DataFrame(판다스)으로 바꾸기
+def mean_average(data, mean_width):
+    new_array = []
+    mean_width = int(mean_width)
+    half_width = int(mean_width / 2)
 
-## Hint
-    # df2 = pd.DataFrame(data)
-    # print(df2)
-def Stock_date(data)
-    columns = ["dates","values"]
-    df = pd.DataFrame(columns=columns)
+    for _ in range(half_width):
+        new_array.append(0)
 
-# TODO 2. 바꾼 DataFrame으로 그래프 그리기
-    for row in data['output2']:
-        dateText = f"{row['stck_bsop_date'][2:4]}/{row['stck_bsop_date'][4:6]}/{row['stck_bsop_date'][6:8]}"
-        new_row =  pd.DataFrame([{"dates":dateText,"values":int(row['stck_clpr'])}])
-        df = pd.concat([df,new_row],ignore_index=True)
+    for idx, _ in enumerate(data):
+        if idx < half_width:
+            continue
+        elif idx > len(data) - (half_width + 1):
+            continue
+        else:
+            newValue = sum(data[idx - half_width : idx + half_width + 1]) / mean_width
+            new_array.append(newValue)
 
-        fig, ax = plt.subplots()
-        df_sorted = df.sort_values("dates")
+    for _ in range(half_width):
+        new_array.append(0)
 
-        df_smoothed1 = mean_average(df_sorted["values"], 5)
-        df_smoothed2 = mean_average(df_sorted["values"], 15)
-        df_smoothed3 = mean_average(df_sorted["values"], 30)
+    return new_array
 
-        ax.plot(df_sorted["dates"], df_sorted["values"])
-        ax.plot(df_smoothed1, "orange")
-        ax.plot(df_smoothed2, "red")
-        ax.plot(df_smoothed3, "green")
-        ax.legend(["Original", "Smoothed1", "Smoothed2", "Smoothed3"])
+df = pd.DataFrame(response)
 
-        ax.set_xlabel("Date")
+df_ma15 = mean_average(df['value'], 15)
+df_ma30 = mean_average(df['value'], 30)
 
-        ax.tick_params(axis='x', labelrotation=45)
+df['ma15'] = df_ma15
+df['ma30'] = df_ma30
 
-        fig.savefig(f"{data['output1']['stck_shrn_iscd']}_result.png")
-
-        
-        print(df)
-        return df
-
+st.dataframe(df, hide_index=True)
+st.line_chart(df, x='date', y=[ 'ma15', 'ma30', 'value',])
 
 
