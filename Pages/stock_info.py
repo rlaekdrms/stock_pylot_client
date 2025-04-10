@@ -45,17 +45,8 @@ st.sidebar.header("User Input")
 
 ## Sidebar User Input
 
-# ticker_type: 라디오 버튼
-stock_ticker_type_selector = st.sidebar.radio("Ticker Type Selector",("stock_ticker","stock_code")) 
 
-# "stock_ticker"를 stock_ticker_type_selector에 대입하고 있는 코드
-# 목표: stock_ticker_type_selector 가 "stock_ticker"인지 물어봐야 함
-# if stock_ticker_type_selector="stock_ticker":
-if stock_ticker_type_selector == "stock_ticker":
-    stock_ticker = st.sidebar.text_input("Ticker", "AAPL")
-# else stock_ticker_type_selector="stock_code":
-else:
-    stock_code = st.sidebar.text_input("Code","000660")
+stock_code = st.sidebar.text_input("Code","000660")
 
 stock_start_date = st.sidebar.date_input("Start Date") # 조회 시작 날짜 입력
 stock_end_date = st.sidebar.date_input("End Date") # 조회 끝 날짜 입력기
@@ -65,12 +56,8 @@ stock_end_date = st.sidebar.date_input("End Date") # 조회 끝 날짜 입력기
 left, right = st.sidebar.columns(2)
 
 if right.button("조회", icon=":material/query_stats:", type="primary"):
-    ## 본 페이지 내용
 
-    if stock_ticker_type_selector == "stock_ticker":
-        st.write(f"Stock Ticker: {stock_ticker}")
-    else:
-        st.write(f"Stock Code: {stock_code}")
+    st.write(f"Stock Code: {stock_code}")
 
     st.write(f"stock start date: {stock_start_date}")
     st.write(f"stock end date: {stock_end_date}")
@@ -98,28 +85,32 @@ if right.button("조회", icon=":material/query_stats:", type="primary"):
     
     print(stock_start_date)
     
-    response = requests.post(url,headers=headers,json=data)
-
+    try:
+        response = requests.post(url,headers=headers,json=data)
+    except Exception as err:
+        st.write(err)
       
     
 
     # if response["status_code"] == "200":
     # data = response["data"]
-    data = response
+    try:    
+        data = response.json()
 
-    df = pd.DataFrame(data)
+        print(data)
 
-    df_ma15 = mean_average(df['values'], 15)
-    df_ma30 = mean_average(df['values'], 30)
-
-    df['ma15'] = df_ma15
-    df['ma30'] = df_ma30
-
-    st.dataframe(df, hide_index=True)
-    st.line_chart(df, x='dates', y=[ 'ma15', 'ma30', 'values',])
-    # elif response["status_code"] == "404":
-        # st.warning("주식 정보를 불러올 수 없습니다")
+        df = pd.DataFrame(data)
 
 
-# left.button("초기화", icon=":material/restart_alt:", type="secondary")
+        df_ma15 = mean_average(df['values'], 15)
+        df_ma30 = mean_average(df['values'], 30)
+
+        df['ma15'] = df_ma15
+        df['ma30'] = df_ma30
+
+        st.dataframe(df, hide_index=True)
+        st.line_chart(df, x='dates', y=[ 'ma15', 'ma30', 'values',])
+    except Exception as err:
+        st.write("주식정보를 조회하는데 실패했습니다")
+       
 
