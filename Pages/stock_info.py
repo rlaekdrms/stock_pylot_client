@@ -1,5 +1,7 @@
 import requests
 from Shared.utils import mean_average
+import os
+import json
 
 import streamlit as st
 import pandas as pd
@@ -62,5 +64,10 @@ if st.sidebar.button("조회", icon=":material/query_stats:", type="primary"):
         st.line_chart(df, x='dates', y=[ 'ma15', 'ma30', 'values',])
     except Exception as err:
         st.write("주식정보를 조회하는데 실패했습니다")
-       
 
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+    SUB_DIR = "Data"
+    FILE_NAME = "favorites.txt"
+
+    FAV_DIR = os.path.join(BASE_DIR, SUB_DIR, FILE_NAME)
