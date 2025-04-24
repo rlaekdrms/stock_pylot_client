@@ -25,12 +25,21 @@ st.sidebar.header("주식 목록")
 
 
     
-favorites = []
-with open(FAV_DIR,"r") as file: 
-    try:
-        favorites = [line.strip() for line in file if line.strip()]
-    except Exception as e:
-        st.write(e)
+# favorites = []
+def load_favorites():
+    with open(FAV_DIR,"r") as file: 
+        try:
+            return [line.strip() for line in file if line.strip()]
+        except Exception as e:
+            st.write(e)
+
+favorites = load_favorites()
+
+def update_favorites(favorites):
+    with open(FAV_DIR,"w") as file:
+        for favorite in favorites:
+            file.write(f"{favorite}\n")
+
 
 stock_end_date = datetime.now()
 stock_start_date = datetime(stock_end_date.year, stock_end_date.month - 1, stock_end_date.day)
@@ -75,11 +84,21 @@ for favorite in favorites:
             st.line_chart(df, x='dates', y=[ 'ma15', 'ma30', 'values',])
         except Exception as err:
             st.write("주식정보를 조회하는데 실패했습니다")
-
+            
 
 new_stock_id = st.sidebar.text_input("즐겨찾기 추가하기")
 
 if st.sidebar.button("추가하기", type="primary"):
     favorites.append(new_stock_id)
-    with open(FAV_DIR, "a") as file: 
-        file.write(f"\n{new_stock_id}")
+    # with open(FAV_DIR, "a") as file: 
+    #     file.write(f"\n{new_stock_id}")
+
+    update_favorites(favorites)
+    st.rerun()
+
+if st.sidebar.button("삭제하기", type="primary"):
+    favorites.remove(new_stock_id)
+
+    update_favorites(favorites)
+    st.rerun()
+            
