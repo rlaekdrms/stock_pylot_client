@@ -112,9 +112,19 @@ if st.sidebar.button("추가하기", type="primary"):
 
     st.rerun()
 
-if st.sidebar.button("삭제하기", type="primary"):
+def deleteFavorite(new_stock_id):
     favorites.remove(new_stock_id)
 
     update_favorites(favorites)
+    
+    return True
+
+
+if st.sidebar.button("삭제하기", type="primary"):
+    if is_duplicate(new_stock_id):
+        deleteFavorite(new_stock_id)
+    else:
+        st.toast("존재하지 않는 코드입니다",icon=":material/warning:")
+        time.sleep(2)
     st.rerun()
             
