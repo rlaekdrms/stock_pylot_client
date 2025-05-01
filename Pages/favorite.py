@@ -6,6 +6,8 @@ from Shared.utils import mean_average
 
 import streamlit as st
 import pandas as pd
+import time
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -87,13 +89,27 @@ for favorite in favorites:
             
 
 new_stock_id = st.sidebar.text_input("즐겨찾기 추가하기")
-
-if st.sidebar.button("추가하기", type="primary"):
+def addFavorite(new_stock_id):
     favorites.append(new_stock_id)
-    # with open(FAV_DIR, "a") as file: 
-    #     file.write(f"\n{new_stock_id}")
 
     update_favorites(favorites)
+    
+    return True
+
+def is_duplicate(new_stock_id):
+    if favorites.count(new_stock_id)>0:
+        return True
+    else:
+        return False
+    
+
+if st.sidebar.button("추가하기", type="primary"):
+    if is_duplicate(new_stock_id):
+        st.toast("중복된 주식코드입니다",icon=":material/warning:")
+        time.sleep(2)
+    else:
+        addFavorite(new_stock_id)    
+
     st.rerun()
 
 if st.sidebar.button("삭제하기", type="primary"):
