@@ -4,6 +4,7 @@ import json
 import time
 from collections import defaultdict
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 ## 페이지 구성
@@ -101,6 +102,10 @@ def aggregate_portfolio(portfolio_list):
 st.subheader("📊 포트폴리오 요약")
 aggregated_portfolio = aggregate_portfolio(portfolio_list)
 
+def get_current_price(code):
+    dummy_price = {"035720": 38050.0, "000660": 82000.0, "005930": 54300.0}
+    return dummy_price.get(code.upper(), 100.0)
+
 if aggregated_portfolio:
     col1, col2 = st.columns([2,3])
     with col1:
@@ -119,4 +124,29 @@ if aggregated_portfolio:
         
         ax.axis("equal")
         st.pyplot(fig)
+
+    with col2:
+        summary_data = []
+        for item in aggregated_portfolio:
+            code = item["code"]
+            avg = item["avg_price"]
+            qty = item["quantity"]
+            current = get_current_price(code)
+            profit = (current - avg) * qty
+            profit_rate = ((current - avg) / avg) * 100
+
+            summary_data.append(
+                {
+                    "code":code,
+                    "qty":qty,
+                    "avg":avg,
+                    "cur":int(current),
+                    "prof":int(profit),
+                    "%":int(profit_rate),
+                }
+            )
+        
+        df_summary = pd.DataFrame(summary_data)
+        st.table(df_summary)
+
 
