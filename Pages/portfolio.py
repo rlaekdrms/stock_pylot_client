@@ -148,5 +148,30 @@ if aggregated_portfolio:
         
         df_summary = pd.DataFrame(summary_data)
         st.table(df_summary)
+else:
+    st.info("아직 등록된 종목이 없습니다.")
 
 
+st.subheader("📉 매수단가별 손익분석")
+if portfolio and portfolio.get("portfolio"):
+    for i, item in enumerate(portfolio["portfolio"]):
+        code = item["code"]
+        avg = item["avg_price"]
+        qty = item["quantity"]
+        current = get_current_price(code)
+        diff = current - avg
+        profit = diff * qty
+        color = "green" if profit >= 0 else "red"
+        st.markdown(
+            f"""
+            <div style="margin-bottom: 10px; padding:10px; border:1px solid #eee; border-radius:10px;">
+                <h4>{code}</h4>
+                <p>📥 매수가: {avg} | 📈 현재가: {current}</p>
+                <p>📦 수량: {qty}주</p>
+                <p>💰 평가손익: <span style='color:{color}'>{profit:,.2f}원</span></p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+else:
+    st.info("아직 등록된 종목이 없습니다.")
