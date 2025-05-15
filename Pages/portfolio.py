@@ -175,3 +175,4 @@ if portfolio and portfolio.get("portfolio"):
         )
 else:
     st.info("아직 등록된 종목이 없습니다.")
+
